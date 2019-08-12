@@ -24,6 +24,8 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
+import javax.persistence.RollbackException;
+
 @Order(Ordered.HIGHEST_PRECEDENCE - 1)
 @ControllerAdvice
 @Slf4j
@@ -88,6 +90,10 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         apiError.setMessage("Validation error");
         apiError.addValidationErrors(ex.getBindingResult().getFieldErrors());
         apiError.addValidationError(ex.getBindingResult().getGlobalErrors());
+        
+        if (apiError.getSubErrors().size() > 0) { // If there are sub errors, get the first for default.
+        	apiError.setMessage(apiError.getSubErrors().get(0).getMessage());
+        }
         return buildResponseEntity(apiError);
     }
 
@@ -100,9 +106,13 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(javax.validation.ConstraintViolationException.class)
     protected ResponseEntity<Object> handleConstraintViolation(
             javax.validation.ConstraintViolationException ex) {
-        ApiError apiError = new ApiError(BAD_REQUEST);
+        
+    	ApiError apiError = new ApiError(BAD_REQUEST);
         apiError.setMessage("Validation error");
         apiError.addValidationErrors(ex.getConstraintViolations());
+        if (apiError.getSubErrors().size() > 0) { // If there are sub errors, get the first for default.
+        	apiError.setMessage(apiError.getSubErrors().get(0).getMessage());
+        }
         return buildResponseEntity(apiError);
     }
 
@@ -205,6 +215,23 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         }
         return buildResponseEntity(new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, ex));
     }
+    
+    @ExceptionHandler(RollbackException.class)
+    protected ResponseEntity<Object> handleRollbackException(RollbackException exception, WebRequest request) {
+    	if (exception.getCause() instanceof javax.validation.ConstraintViolationException) {
+    		javax.validation.ConstraintViolationException ex = (javax.validation.ConstraintViolationException) exception.getCause();
+    		
+    		ApiError apiError = new ApiError(BAD_REQUEST);
+            apiError.setMessage("Validation error");
+            apiError.addValidationErrors(ex.getConstraintViolations());
+            if (apiError.getSubErrors().size() > 0) { // If there are sub errors, get the first for default.
+            	apiError.setMessage(apiError.getSubErrors().get(0).getMessage());
+            }
+            return buildResponseEntity(apiError);
+    	}
+    	return buildResponseEntity(new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, exception));
+    }
+    
 
     /**
      * Handle Exception, handle generic Exception.class
@@ -220,7 +247,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         apiError.setDebugMessage(ex.getMessage());
         return buildResponseEntity(apiError);
     }
-
+    
 
     protected ResponseEntity<Object> buildResponseEntity(ApiError apiError) {
         return new ResponseEntity<>(apiError, apiError.getStatus());

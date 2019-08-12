@@ -109,7 +109,9 @@ public class ApiError {
 
 
     public abstract class ApiSubError {
-
+    	
+    	protected abstract String getMessage();
+    	
     }
 
     @Data
