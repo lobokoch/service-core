@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class MailSender {
 	
-	public static final String EMAIL_FROM_DEFAULT = "lobokoch@gmail.com";
+	public static final String EMAIL_FROM_DEFAULT = "kerubin.platform@gmail.com";
 
 	@Inject
 	private JavaMailSender mailSender;

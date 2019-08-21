@@ -37,7 +37,7 @@ public class CoreUtils {
 		
 		return index == value.length();
 	}
-
+	
 	public static boolean isNotEmpty(Object value) {
 		return !isEmpty(value);
 	}
@@ -138,11 +138,11 @@ public class CoreUtils {
 		return formatter.format(dateAnTime);
 	}
 	
-	public static BigDecimal getSafeVal(BigDecimal value) {
+	public static BigDecimal getSafeValue(BigDecimal value) {
 		return value != null ? value : new BigDecimal(0.0);
 	}
 	
-	public static BigDecimal getSafePositiveVal(BigDecimal value) {
+	public static BigDecimal getSafePositiveValue(BigDecimal value) {
 		return isGtZero(value) ? value : new BigDecimal(0.0);
 	}
 	
@@ -180,6 +180,20 @@ public class CoreUtils {
 	}
 	
 	/**
+	 * Returns true if value is equals then BigDecimal.ZERO, or false otherwise.
+	 * */
+	public static boolean isZero(BigDecimal value) {
+		return BigDecimal.ZERO.equals(value);
+	}
+	
+	/**
+	 * Returns true if value is greater then o equals to BigDecimal.ZERO, or false otherwise.
+	 * */
+	public static boolean isGteZero(BigDecimal value) {
+		return isZero(value) || isGt(value, BigDecimal.ZERO);
+	}
+	
+	/**
 	 * Returns true if value is greater then BigDecimal.ZERO, or false otherwise.
 	 * */
 	public static boolean isGtZero(BigDecimal value) {
@@ -191,6 +205,13 @@ public class CoreUtils {
 	 * */
 	public static boolean isLtZero(BigDecimal value) {
 		return isLt(value, BigDecimal.ZERO);
+	}
+	
+	/**
+	 * Returns true if value is less then o equals to BigDecimal.ZERO, or false otherwise.
+	 * */
+	public static boolean isLteZero(BigDecimal value) {
+		return isZero(value) || isLt(value, BigDecimal.ZERO);
 	}
 	
 	/**

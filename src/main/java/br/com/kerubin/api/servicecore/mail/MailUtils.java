@@ -7,6 +7,7 @@ public class MailUtils {
 	public static final String EMAIL_KERUBIN_FINANCEIRO = "kerubin.financeiro@gmail.com";
 	public static final String EMAIL_KERUBIN_SUPORTE = "kerubin.suporte@gmail.com";
 	public static final String EMAIL_KERUBIN_PLATFORM = "kerubin.platform@gmail.com";
+	public static final String EMAIL_KERUBIN_NOTIFICADOR = "kerubin.notificador@gmail.com";
 	
 	public static final String BR = "<br>";
 	
