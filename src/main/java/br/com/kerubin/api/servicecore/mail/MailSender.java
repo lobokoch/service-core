@@ -2,12 +2,13 @@ package br.com.kerubin.api.servicecore.mail;
 
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
 
-import javax.inject.Inject;
 import javax.mail.internet.MimeMessage;
 
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
@@ -18,9 +19,10 @@ import lombok.extern.slf4j.Slf4j;
 public class MailSender {
 	
 	public static final String EMAIL_FROM_DEFAULT = "kerubin.platform@gmail.com";
+	public static final String EMAIL_DEFAULT_PWD = "lobo181169";
 
-	@Inject
-	private JavaMailSender mailSender;
+	//@Inject
+	// private JavaMailSender mailSender;
 
 	public void sendMailAsync(String from, List<String> recipients, String subject, String message) {
 		CompletableFuture.runAsync(() -> sendMail(from, recipients, subject, message));
@@ -28,6 +30,8 @@ public class MailSender {
 	
 	public void sendMail(String from, List<String> recipients, String subject, String message) {
 		String logHeader = MessageFormat.format("from \"{0}\" to \"{1}\" subject \"{2}\"", from, recipients, subject);
+		
+		JavaMailSender mailSender = buildJavaMailSender(from, EMAIL_DEFAULT_PWD);
 		
 		MimeMessage mimeMessage = mailSender.createMimeMessage();
 
@@ -46,6 +50,23 @@ public class MailSender {
 			new MailSenderException("Error sending e-mail " + logHeader);
 		}
 
+	}
+	
+	public JavaMailSender buildJavaMailSender(String username, String password) {
+		Properties props = new Properties();
+		props.put("mail.transport.protocol", "smtp");
+		props.put("mail.smtp.auth", true);
+		props.put("mail.smtp.starttls.enable", true);
+		props.put("mail.smtp.connectiontimeout", 10000);
+		
+		JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+		mailSender.setJavaMailProperties(props);
+		mailSender.setHost("smtp.gmail.com");
+		mailSender.setPort(587);
+		mailSender.setUsername(username);
+		mailSender.setPassword(password);
+		
+		return mailSender;
 	}
 
 }

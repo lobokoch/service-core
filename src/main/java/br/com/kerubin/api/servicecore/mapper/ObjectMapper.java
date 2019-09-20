@@ -16,12 +16,16 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.persistence.Id;
 
@@ -35,7 +39,7 @@ import org.springframework.stereotype.Component;
 
 import br.com.kerubin.api.servicecore.annotation.Password;
 
-@Component("security.authorization.ObjectMapper")
+@Component("kerubin.servicecore.mapper.ObjectMapper")
 public class ObjectMapper {
 	
 	private static Logger log = LoggerFactory.getLogger(ObjectMapper.class);
@@ -63,6 +67,22 @@ public class ObjectMapper {
 	        Map<Object, Object> visited = new HashMap<>();
 	        copyProperties(source, target, visited, isEntityToDto);
 	    }
+		
+		public static List<Field> getAllDeclaredFields(Class<?> clazz) {
+			
+			if (clazz == null) {
+				return Collections.emptyList();
+			}
+			
+			Set<Field> fields = new LinkedHashSet<>();
+			do {
+				fields.addAll(Arrays.asList(clazz.getDeclaredFields()));
+				clazz = clazz.getSuperclass();
+			} while (clazz != null);
+			
+			return fields.stream().collect(Collectors.toList());
+			
+		}
 	    
 	    protected void copyProperties(Object source, Object target, Map<Object, Object> visited, boolean isEntityToDto) {
 	        if (source == null || target == null) {
@@ -71,8 +91,8 @@ public class ObjectMapper {
 	        
 	        visited.put(source, target);
 	        
-	        List<Field> sourceFieds = Arrays.asList(source.getClass().getDeclaredFields());
-	        List<Field> targetFieds = Arrays.asList(target.getClass().getDeclaredFields());
+	        List<Field> sourceFieds = getAllDeclaredFields(source.getClass());
+	        List<Field> targetFieds = getAllDeclaredFields(target.getClass());
 	        targetFieds.forEach(targetField -> {
 	            Optional<Field> sourceFieldOptional = sourceFieds.stream().filter(it -> it.getName().equals(targetField.getName())).findFirst();
 	            if (sourceFieldOptional.isPresent()) {

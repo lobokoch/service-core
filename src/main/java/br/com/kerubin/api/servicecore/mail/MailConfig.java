@@ -22,7 +22,7 @@ public class MailConfig {
 		mailSender.setJavaMailProperties(props);
 		mailSender.setHost("smtp.gmail.com");
 		mailSender.setPort(587);
-		mailSender.setUsername("lobokoch@gmail.com");
+		mailSender.setUsername(MailSender.EMAIL_FROM_DEFAULT);
 		mailSender.setPassword("lobo181169");
 		
 		return mailSender;
