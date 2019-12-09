@@ -4,13 +4,28 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
+import java.text.MessageFormat;
+import java.text.NumberFormat;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Random;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class CoreUtils {
 	
@@ -21,6 +36,12 @@ public class CoreUtils {
 	public static final String ENTITIES = "entities";
 	public static final String _ENTITIES_ = "/entities/";
 	public static final String AUTO_COMPLETE = "autocomplete";
+	
+	public static final Locale LOCALE_PT_BR = new Locale("pt","BR");
+	
+	public static String format(String pattern, Object ... arguments) {
+		return MessageFormat.format(pattern, arguments);
+	}
 	
 	public static boolean allCharsIsEquals(String value) {
 		if(isEmpty(value)) {
@@ -138,6 +159,14 @@ public class CoreUtils {
 		return formatter.format(dateAnTime);
 	}
 	
+	public static String formatMoney(BigDecimal value) {
+		NumberFormat formatter = NumberFormat.getCurrencyInstance(LOCALE_PT_BR);
+		formatter.setMaximumFractionDigits(3);
+		formatter.setMinimumFractionDigits(2);
+		
+		return formatter.format(value);
+	}
+	
 	public static BigDecimal getSafeValue(BigDecimal value) {
 		return value != null ? value : new BigDecimal(0.0);
 	}
@@ -205,6 +234,17 @@ public class CoreUtils {
 	 * */
 	public static boolean isLtZero(BigDecimal value) {
 		return isLt(value, BigDecimal.ZERO);
+	}
+	
+	/**
+	 * Returns Convert a negative value to a positive value.
+	 * */
+	public static BigDecimal toPositive(BigDecimal value) {
+		if (isLtZero(value)) {
+			value = value.multiply(new BigDecimal(-1));
+		}
+		
+		return value;
 	}
 	
 	/**
@@ -315,5 +355,143 @@ public class CoreUtils {
 		
 		return false;
 	}
+	
+	public static <T> List<T> getRandomItemsOf(List<T> list, int size) {
+		if (isEmpty(list) || size <= 0) {
+			return Collections.emptyList();
+		}
+		List<T> result = new ArrayList<>();
+		Random ran = new Random();
+		int bound = list.size();
+		int attempts = 0;
+		do {
+			attempts++;
+			int index = ran.nextInt(bound);
+			T item = list.get(index);
+			if (!result.contains(item)) {
+				result.add(item);
+			}
+		} while (result.size() < size && (attempts < Integer.MAX_VALUE));
+		
+		return result;
+		
+	}
+	
+	public static List<String> generateRandomStrings(String prefix, int begin, int end, int size) {
+		String pre = isEmpty(prefix) ? "Some Prefix" : prefix;
+		Random ran = new Random();
+		int attempts= 0;
+		
+		if (size <= 0 || (end < begin)) {
+			return Collections.emptyList();
+		}
+		
+		List<String> result = new ArrayList<>();
+		do {
+			int nextInt = ran.nextInt(end);
+			attempts++;
+			if (isBetween(nextInt, begin, end)) {
+				String str = pre + expandValue(nextInt);
+				if (!result.contains(str)) {
+					result.add(str);
+				}
+			}
+			
+		} while (result.size() < size && (attempts < Integer.MAX_VALUE)); // Prevent infinite loop.
+		
+		return result;
+	}
+	
+	public static String expandValue(int value) {
+		return expandValue("" + value);
+	}
+	
+	public static String expandValue(String value) {
+		String result = StringUtils.repeat(value, 3);
+		return result;
+	}
+	
+	public static boolean isBetween(int value, int begin, int end) {
+		return value >= begin && value <= end;
+	}
+	
+	public static String generateRandomString(int maxLength) {
+		int length = (maxLength > 30) ? 30 : maxLength; 
+		String chars = RandomStringUtils.randomAlphabetic(length - 1) + " ";
+		String value = RandomStringUtils.random(length, chars).trim();
+		
+		// Must remove white spaces in the begining.
+		int attempts= 0;
+		while (value.length() < length && (attempts < Integer.MAX_VALUE) ) {
+			attempts++;
+			value = RandomStringUtils.random(length, chars).trim();
+		} 
+
+		return value;
+	}
+	
+	public static LocalDate toLocalDate(Date date) {
+		return Instant.ofEpochMilli(date.getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
+	}
+	
+	public static String trimLeft(String value, char target) {
+		if (isEmpty(value)) {
+			return value;
+		}
+		
+		while (value.length() > 0 && value.charAt(0) == target) {
+			value = value.substring(1);
+		}
+		
+		return value;
+	}
+	
+	public static List<String> getTokens(String str) {
+		return CoreUtils.getTokens(str, /*minTokenLength=*/3, /*tokensToLower=*/true);
+	}
+	
+	public static List<String> getTokens(String str, int minTokenLength, boolean tokensToLower) {
+		if (isEmpty(str)) {
+			return Collections.emptyList();
+		}
+		
+		String separatorChars = " -.,/:";
+		Set<String> tokens = new LinkedHashSet<>();
+		
+		int index = 0;
+		int length = str.length();
+		//"Conta de Luz Bradesco C-celesc Distr./sc"
+		StringBuilder token = new StringBuilder();
+		while (index < length) {
+			char ch = str.charAt(index);
+			index++;
+			
+			if (separatorChars.indexOf(ch) == -1) {
+				token.append(ch);
+			}
+			else { // Break in a word
+				String word = token.toString();
+				if (word.length() >= minTokenLength) {
+					if (tokensToLower) {
+						word = word.toLowerCase();
+					}
+					tokens.add(word);
+				}
+				token = new StringBuilder();
+			}
+		} // while
+		
+		// Last token/word
+		String word = token.toString();
+		if (word.length() >= minTokenLength) {
+			if (tokensToLower) {
+				word = word.toLowerCase();
+			}
+			tokens.add(word);
+		}
+		
+		return tokens.stream().collect(Collectors.toList());
+	}
+	
 	
 }

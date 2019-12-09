@@ -8,7 +8,7 @@ import lombok.Setter;
 public class Father {
 	
 	private String field1;
-	private int field2;
+	private Integer field2;
 	
 
 }

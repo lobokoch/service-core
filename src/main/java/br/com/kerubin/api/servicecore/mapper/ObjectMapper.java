@@ -10,11 +10,13 @@ package br.com.kerubin.api.servicecore.mapper;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -38,15 +40,19 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
 import br.com.kerubin.api.servicecore.annotation.Password;
+import static br.com.kerubin.api.servicecore.util.CoreUtils.*;
 
 @Component("kerubin.servicecore.mapper.ObjectMapper")
 public class ObjectMapper {
 	
 	private static Logger log = LoggerFactory.getLogger(ObjectMapper.class);
 	
+	public static final String PASSWORD = "*******";
+	
 	private static final List<?> DSL_PRIMITIVE_TYPES = Arrays.asList(LocalDate.class, LocalTime.class, LocalDateTime.class,
 				Date.class, Instant.class, String.class, Long.class, 
-	            Boolean.class, UUID.class, BigDecimal.class, Double.class);
+	            Boolean.class, UUID.class, BigDecimal.class, Double.class,
+	            Integer.class);
 		
 		
 		public <T> T map(Object source, Class<T> targetClass) {
@@ -83,13 +89,36 @@ public class ObjectMapper {
 			return fields.stream().collect(Collectors.toList());
 			
 		}
-	    
-	    protected void copyProperties(Object source, Object target, Map<Object, Object> visited, boolean isEntityToDto) {
+		
+	    public static boolean isList(Object obj) {
+	    	return obj != null && obj instanceof List;
+	    }
+		
+	    @SuppressWarnings("unchecked")
+		protected void copyProperties(Object source, Object target, Map<Object, Object> visited, boolean isEntityToDto) {
 	        if (source == null || target == null) {
 	            return;
 	        }
 	        
 	        visited.put(source, target);
+	        
+	        if (isList(source)) {
+	        	List<Object> sourceList = (List<Object>) source;
+	        	List<Object> targetList = (List<Object>) target;
+	        	Class<?> targetListItemClass = targetList.get(0).getClass();
+	        	targetList.clear();
+	        	if (isEmpty(sourceList)) {
+	        		return;
+	        	}
+	        	
+	        	sourceList.forEach(it -> {
+	        		Object targetListItem = BeanUtils.instantiateClass(targetListItemClass);
+	        		copyProperties(it, targetListItem, isEntityToDto);
+	        		targetList.add(targetListItem);
+	        	});
+	        	
+	        	return;
+	        }
 	        
 	        List<Field> sourceFieds = getAllDeclaredFields(source.getClass());
 	        List<Field> targetFieds = getAllDeclaredFields(target.getClass());
@@ -103,7 +132,7 @@ public class ObjectMapper {
 	                    
 	                    if (DSL_PRIMITIVE_TYPES.stream().anyMatch(it -> it.equals(targetFieldType)) || (targetFieldType.isPrimitive() && sourceFieldType.isPrimitive()) ) {
 	                    	// Do not permit leave password outside by DTOs
-	                    	Object value = (isPasswordField(sourceField) && isEntityToDto) ? "*******" : getFieldValue(source, sourceField);
+	                    	Object value = (isPasswordField(sourceField) && isEntityToDto) ? PASSWORD : getFieldValue(source, sourceField);
 	                    	setFieldValue(target, targetField, value);
 	                    }
 	                    else if (targetFieldType.isEnum()) {
@@ -112,7 +141,7 @@ public class ObjectMapper {
 	                            if (value != null) {
 		                            String sourceEnumName = ((Enum<?>) value).name();
 		                            
-		                            @SuppressWarnings({ "rawtypes", "unchecked" })
+		                            @SuppressWarnings({ "rawtypes" })
 		                            Enum<?> targetEnumValue = Enum.valueOf( (Class<Enum>) targetFieldType, sourceEnumName);
 		                            setFieldValue(target, targetField, targetEnumValue);
 	                            }
@@ -133,8 +162,17 @@ public class ObjectMapper {
 						            targetFieldValue = visited.get(sourceFieldValue);
 						        }
 						        else {
-						        	
-						            targetFieldValue = BeanUtils.instantiateClass(targetFieldType);
+						        	if (targetFieldType.equals(List.class)) {
+										targetFieldValue = BeanUtils.instantiateClass(ArrayList.class);
+						        		
+						        		ParameterizedType listType = (ParameterizedType) targetField.getGenericType();
+						        	    Class<?> listItemClass = (Class<?>) listType.getActualTypeArguments()[0];
+						        	    Object listItem = BeanUtils.instantiateClass(listItemClass);
+						        	    ((List<Object>)targetFieldValue).add(listItem);
+						        	}
+						        	else {
+						        		targetFieldValue = BeanUtils.instantiateClass(targetFieldType);
+						        	}
 						            
 						            // Source field can has an entity name, but with uuid value instead of an entity object
 						            // Also, source field and target field can be objects with field names matching, but with different class names.
@@ -193,12 +231,21 @@ public class ObjectMapper {
 	
 	    
 	    private void setFieldValue(Object obj, Field field, Object value) {
+	    	
+	    	if (obj == null || field == null) {
+	    		log.warn("Calling setFieldValue with obj or field null.");
+	    		return;
+	    	}
+	    	
 	    	PropertyDescriptor pd = getPropertyDescriptor(obj, field);
 	    	if (pd != null && pd.getWriteMethod() != null) { // Has setter
 	    		try {
 					pd.getWriteMethod().invoke(obj, value);
 				} catch (Exception e) {
-					log.error("Erro setting object value: " + e.getMessage(), e);
+					String objStr = obj.getClass().getName();
+					String fieldStr = field.getName();
+					String str = objStr + "." + fieldStr;
+					log.error("Error(1) at setFieldValue object value for: " + str, e);
 				}
 	    	}  else { // Does not has setter.
 	    		try {
@@ -206,7 +253,10 @@ public class ObjectMapper {
 	    			field.set(obj, value);
 				}
 				catch(Exception ex) {
-					log.error("Erro getting object value: " + ex.getMessage(), ex);
+					String objStr = obj.getClass().getName();
+					String fieldStr = field.getName();
+					String str = objStr + "." + fieldStr;
+					log.error("Error(2) at setFieldValue object value for: " + str, ex);
 				}
 	    	}
 	    }
