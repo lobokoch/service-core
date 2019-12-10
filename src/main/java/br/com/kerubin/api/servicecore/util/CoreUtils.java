@@ -175,6 +175,11 @@ public class CoreUtils {
 		return isGtZero(value) ? value : new BigDecimal(0.0);
 	}
 	
+	public static BigDecimal getDiff(BigDecimal value1, BigDecimal value2) {
+		BigDecimal result = value1.subtract(value2).abs();
+		return result;
+	}
+	
 	/**
 	 * Returns true if valueA is equals valueB, or false otherwise.
 	 * */
