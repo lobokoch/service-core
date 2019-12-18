@@ -180,6 +180,9 @@ public class CoreUtils {
 		return result;
 	}
 	
+	public static boolean isNotEquals(BigDecimal valueA, BigDecimal valueB) {
+		return !isEquals(valueA, valueB);
+	}
 	/**
 	 * Returns true if valueA is equals valueB, or false otherwise.
 	 * */
