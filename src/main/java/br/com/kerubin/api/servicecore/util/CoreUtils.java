@@ -501,5 +501,9 @@ public class CoreUtils {
 		return tokens.stream().collect(Collectors.toList());
 	}
 	
+	public static <T> List<T> toSafeList(List<T> aList) {
+		return isNotEmpty(aList) ? aList : Collections.emptyList();
+	}
+	
 	
 }
