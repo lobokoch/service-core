@@ -4,10 +4,21 @@ import static br.com.kerubin.api.servicecore.util.CoreUtils.*;
 
 public class MailUtils {
 	
+	public static final String EMAIL_LOBOKOCH = "lobokoch@gmail.com";
+	
+	public static final String EMAIL_KERUBIN_FINANCEIRO_PERSONAL = "Kerubin Financeiro";
+	public static final String EMAIL_KERUBIN_FINANCEIRO_APP_PWD = "xtgxrgwnpdbohivr";
 	public static final String EMAIL_KERUBIN_FINANCEIRO = "kerubin.financeiro@gmail.com";
+	
 	public static final String EMAIL_KERUBIN_SUPORTE = "kerubin.suporte@gmail.com";
+	
+	public static final String EMAIL_KERUBIN_PLATFORM_PERSONAL = "Kerubin";
 	public static final String EMAIL_KERUBIN_PLATFORM = "kerubin.platform@gmail.com";
+	public static final String EMAIL_KERUBIN_PLATFORM_APP_PWD = "bquswgottvwcqvfr";
+	
+	public static final String EMAIL_KERUBIN_NOTIFICADOR_PERSONAL = "Kerubin Notificador";
 	public static final String EMAIL_KERUBIN_NOTIFICADOR = "kerubin.notificador@gmail.com";
+	public static final String EMAIL_KERUBIN_NOTIFICADOR_APP_PWD = "wiezzxrmvljvkptn";
 	
 	public static final String BR = "<br>";
 	

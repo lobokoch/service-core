@@ -33,10 +33,22 @@ public class MailSender {
 	// private JavaMailSender mailSender;
 
 	public void sendMailAsync(String from, List<String> recipients, String subject, String message) {
-		CompletableFuture.runAsync(() -> sendMail(from, recipients, subject, message));
+		CompletableFuture.runAsync(() -> sendMail_OLD(from, recipients, subject, message));
 	}
 	
 	public void sendMail(MailInfo from, List<MailInfo> recipients, String subject, String message) {
+		sendMail(from, recipients, subject, message, false, false);
+	}
+	
+	public void sendMailCc(MailInfo from, List<MailInfo> recipients, String subject, String message) {
+		sendMail(from, recipients, subject, message, true, false);
+	}
+	
+	public void sendMailBcc(MailInfo from, List<MailInfo> recipients, String subject, String message) {
+		sendMail(from, recipients, subject, message, false, true);
+	}
+	
+	public void sendMail(MailInfo from, List<MailInfo> recipients, String subject, String message, boolean isCc, boolean isBcc) {
 		Instant startSendMail = Instant.now();
 		
 		String logHeader = MessageFormat.format("from \"{0}\" to \"{1}\" subject \"{2}\"", from, recipients, subject);
@@ -61,7 +73,15 @@ public class MailSender {
 			
 			tos.removeIf(it -> it == null);
 			
-			helper.setTo(tos.toArray(new InternetAddress[tos.size()]));
+			if (isCc) {
+				helper.setCc(tos.toArray(new InternetAddress[tos.size()]));
+			}
+			else if (isBcc) {
+				helper.setBcc(tos.toArray(new InternetAddress[tos.size()]));
+			}
+			else {
+				helper.setTo(tos.toArray(new InternetAddress[tos.size()]));
+			}
 			
 			//helper.setTo(recipients.toArray(new String[recipients.size()]));
 			helper.setSubject(subject);
@@ -82,7 +102,7 @@ public class MailSender {
 		
 	}
 	
-	public void sendMail(String from, List<String> recipients, String subject, String message) {
+	public void sendMail_OLD(String from, List<String> recipients, String subject, String message) {
 		Instant startSendMail = Instant.now();
 		
 		String logHeader = MessageFormat.format("from \"{0}\" to \"{1}\" subject \"{2}\"", from, recipients, subject);
