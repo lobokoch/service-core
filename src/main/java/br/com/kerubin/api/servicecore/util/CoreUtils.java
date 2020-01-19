@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
+import java.text.DecimalFormat;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.time.Instant;
@@ -157,6 +158,11 @@ public class CoreUtils {
 	public static String formatDateAndTime(LocalDateTime dateAnTime) {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 		return formatter.format(dateAnTime);
+	}
+	
+	public static String formatMoney(DecimalFormat df, BigDecimal value) {
+		BigDecimal val = getSafeValue(value);
+		return df.format(val);
 	}
 	
 	public static String formatMoney(BigDecimal value) {
