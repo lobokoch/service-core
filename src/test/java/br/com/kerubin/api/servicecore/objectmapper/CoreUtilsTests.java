@@ -49,6 +49,44 @@ public class CoreUtilsTests {
 		
 	}
 	
+	// ****************************************
+	@Test
+	public void testFormatNumber1() {
+		
+		BigDecimal value = new BigDecimal("1234567890.987"); 
+		String actual = CoreUtils.formatNumber(value);
+		
+		String expected = "1.234.567.890,987";
+		
+		assertThat(actual).isEqualTo(expected);
+		
+	}
+	
+	@Test
+	public void testFormatNumber2() {
+		
+		BigDecimal value = new BigDecimal("1234567890.98"); // 2 casas decimais
+		String actual = CoreUtils.formatNumber(value);
+		
+		String expected = "1.234.567.890,98"; // 3 casas decimais
+		
+		assertThat(actual).isEqualTo(expected);
+		
+	}
+	
+	@Test
+	public void testFormatNumber3() {
+		
+		BigDecimal value = new BigDecimal("0"); // 2 casas decimais
+		String actual = CoreUtils.formatNumber(value);
+		
+		String expected = "0,00"; 
+		
+		assertThat(actual).isEqualTo(expected);
+		
+	}
+	// ****************************************
+	
 	@Test
 	public void testGetTokensNormalCase() {
 		String str = "Conta de Luz Bradesco C-celesc Distr./sc";

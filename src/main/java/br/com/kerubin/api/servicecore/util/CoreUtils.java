@@ -170,7 +170,15 @@ public class CoreUtils {
 		formatter.setMaximumFractionDigits(3);
 		formatter.setMinimumFractionDigits(2);
 		
-		return formatter.format(value);
+		return formatter.format(getSafeValue(value));
+	}
+	
+	public static String formatNumber(BigDecimal value) {
+		NumberFormat formatter = NumberFormat.getNumberInstance(LOCALE_PT_BR);
+		formatter.setMaximumFractionDigits(3);
+		formatter.setMinimumFractionDigits(2);
+		
+		return formatter.format(getSafeValue(value));
 	}
 	
 	public static BigDecimal getSafeValue(BigDecimal value) {
