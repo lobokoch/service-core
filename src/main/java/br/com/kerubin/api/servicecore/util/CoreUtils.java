@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -517,6 +518,14 @@ public class CoreUtils {
 	
 	public static <T> List<T> toSafeList(List<T> aList) {
 		return isNotEmpty(aList) ? aList : Collections.emptyList();
+	}
+	
+	public static long daysBetween(LocalDate date1, LocalDate date2) {
+		return ChronoUnit.DAYS.between(date1, date2);
+	}
+	
+	public static long daysBetweenAbs(LocalDate date1, LocalDate date2) {
+		return Math.abs(daysBetween(date1, date2));
 	}
 	
 	
