@@ -7,11 +7,29 @@ import br.com.kerubin.api.servicecore.util.CoreUtils;
 import static org.assertj.core.api.Assertions.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 public class CoreUtilsTests {
+	
+	@Test
+	public void daysBetweenAbs() {
+		assertThat(CoreUtils.daysBetweenAbs(LocalDate.of(2020, 3, 7), LocalDate.of(2020, 3, 7))).isZero();
+		
+		assertThat(CoreUtils.daysBetweenAbs(LocalDate.of(2020, 3, 7), LocalDate.of(2020, 3, 6))).isOne();
+		assertThat(CoreUtils.daysBetweenAbs(LocalDate.of(2020, 3, 6), LocalDate.of(2020, 3, 7))).isOne();
+		
+		assertThat(CoreUtils.daysBetweenAbs(LocalDate.of(2020, 4, 10), LocalDate.of(2020, 4, 21))).isEqualTo(11);
+		assertThat(CoreUtils.daysBetweenAbs(LocalDate.of(2020, 4, 21), LocalDate.of(2020, 4, 10))).isEqualTo(11);
+		
+		assertThat(CoreUtils.daysBetweenAbs(LocalDate.of(2020, 1, 1), LocalDate.of(2020, 1, 31))).isEqualTo(30);
+		assertThat(CoreUtils.daysBetweenAbs(LocalDate.of(2020, 1, 31), LocalDate.of(2020, 1, 1))).isEqualTo(30);
+		
+		assertThat(CoreUtils.daysBetweenAbs(LocalDate.of(2020, 1, 1), LocalDate.of(2020, 12, 31))).isEqualTo(365);
+		assertThat(CoreUtils.daysBetweenAbs(LocalDate.of(2020, 12, 31), LocalDate.of(2020, 1, 1))).isEqualTo(365);
+	}
 	
 	@Test
 	public void testFormatMoney1() {
