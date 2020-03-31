@@ -1,6 +1,12 @@
 package br.com.kerubin.api.servicecore.error;
 
-import lombok.extern.slf4j.Slf4j;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+
+import java.text.MessageFormat;
+
+import javax.persistence.RollbackException;
+
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -21,16 +27,61 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
+import lombok.extern.slf4j.Slf4j;
 
-import javax.persistence.RollbackException;
-
-@Order(Ordered.HIGHEST_PRECEDENCE - 1)
+@Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
 @Slf4j
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
-
+	
+	public RestExceptionHandler() {
+		System.out.println("RestExceptionHandler was created.");
+	}
+	
+	// Fallback error handler.
+	@Override
+	protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers,
+			HttpStatus status, WebRequest request) {
+		
+		log.error(MessageFormat.format("Exception not handled: class: {0}, message: {1}.", 
+				ex.getClass().getName(), ex.getMessage()), ex);
+		
+		String message = "Desculpe-nos pelo inconveniente, ocorreu um erro inesperado." + 
+				" Por favor espere alguns minutos e tente executar a operação novamente." + 
+				" Caso o problema persistir, por favor entre em contato com o serviço de suporte.";
+		
+		return buildResponseEntity(new ApiError(BAD_REQUEST, message, ex));
+		
+		//return super.handleExceptionInternal(ex, body, headers, status, request);
+	}
+	
+	/**
+     * Handle MethodArgumentNotValidException. Triggered when an object fails @Valid validation.
+     *
+     * @param ex      the MethodArgumentNotValidException that is thrown when @Valid validation fails
+     * @param headers HttpHeaders
+     * @param status  HttpStatus
+     * @param request WebRequest
+     * @return the ApiError object
+     */
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(
+            MethodArgumentNotValidException ex,
+            HttpHeaders headers,
+            HttpStatus status,
+            WebRequest request) {
+    	
+        ApiError apiError = new ApiError(BAD_REQUEST);
+        apiError.setMessage("Validation error");
+        apiError.addValidationErrors(ex.getBindingResult().getFieldErrors());
+        apiError.addValidationError(ex.getBindingResult().getGlobalErrors());
+        
+        if (apiError.getSubErrors().size() > 0) { // If there are sub errors, get the first for default.
+        	apiError.setMessage(apiError.getSubErrors().get(0).getMessage());
+        }
+        return buildResponseEntity(apiError);
+    }
+	
     /**
      * Handle MissingServletRequestParameterException. Triggered when a 'required' request parameter is missing.
      *
@@ -44,6 +95,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleMissingServletRequestParameter(
             MissingServletRequestParameterException ex, HttpHeaders headers,
             HttpStatus status, WebRequest request) {
+    	
         String error = ex.getParameterName() + " parameter is missing";
         return buildResponseEntity(new ApiError(BAD_REQUEST, error, ex));
     }
@@ -69,32 +121,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         builder.append(" media type is not supported. Supported media types are ");
         ex.getSupportedMediaTypes().forEach(t -> builder.append(t).append(", "));
         return buildResponseEntity(new ApiError(HttpStatus.UNSUPPORTED_MEDIA_TYPE, builder.substring(0, builder.length() - 2), ex));
-    }
-
-    /**
-     * Handle MethodArgumentNotValidException. Triggered when an object fails @Valid validation.
-     *
-     * @param ex      the MethodArgumentNotValidException that is thrown when @Valid validation fails
-     * @param headers HttpHeaders
-     * @param status  HttpStatus
-     * @param request WebRequest
-     * @return the ApiError object
-     */
-    @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(
-            MethodArgumentNotValidException ex,
-            HttpHeaders headers,
-            HttpStatus status,
-            WebRequest request) {
-        ApiError apiError = new ApiError(BAD_REQUEST);
-        apiError.setMessage("Validation error");
-        apiError.addValidationErrors(ex.getBindingResult().getFieldErrors());
-        apiError.addValidationError(ex.getBindingResult().getGlobalErrors());
-        
-        if (apiError.getSubErrors().size() > 0) { // If there are sub errors, get the first for default.
-        	apiError.setMessage(apiError.getSubErrors().get(0).getMessage());
-        }
-        return buildResponseEntity(apiError);
     }
 
     /**
