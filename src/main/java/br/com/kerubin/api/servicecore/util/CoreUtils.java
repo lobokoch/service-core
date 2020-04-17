@@ -82,6 +82,10 @@ public class CoreUtils {
 			return Arrays.asList(value).isEmpty();
 		}
 		
+		if (value instanceof BigDecimal) {
+			return BigDecimal.ZERO.equals(((BigDecimal) value));
+		}
+		
 		return false;
 	}
 	
