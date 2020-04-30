@@ -17,5 +17,5 @@ public class MailInfo {
 	private String personal = MailSender.EMAIL_DEFAULT_PERSONAL;
 	
 	@ToString.Exclude
-	private String password = MailSender.EMAIL_DEFAULT_PWD;
+	private String password = MailUtils.get_EMAIL_KERUBIN_PLATFORM_APP_PWD();
 }

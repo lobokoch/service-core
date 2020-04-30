@@ -25,9 +25,6 @@ public class MailSender {
 	
 	public static final String EMAIL_DEFAULT_PERSONAL = "Kerubin";
 	public static final String EMAIL_FROM_DEFAULT = "kerubin.platform@gmail.com";
-	//public static final String EMAIL_DEFAULT_PWD = "lobo181169";
-	public static final String KERUBIN_PLATFORM_GMAIL_COM_APP_PWD = "bquswgottvwcqvfr";
-	public static final String EMAIL_DEFAULT_PWD = KERUBIN_PLATFORM_GMAIL_COM_APP_PWD;
 
 	//@Inject
 	// private JavaMailSender mailSender;
@@ -107,7 +104,7 @@ public class MailSender {
 		
 		String logHeader = MessageFormat.format("from \"{0}\" to \"{1}\" subject \"{2}\"", from, recipients, subject);
 		
-		JavaMailSender mailSender = buildJavaMailSender(from, EMAIL_DEFAULT_PWD);
+		JavaMailSender mailSender = buildJavaMailSender(from, MailUtils.get_EMAIL_KERUBIN_PLATFORM_APP_PWD());
 		
 		MimeMessage mimeMessage = mailSender.createMimeMessage();
 
