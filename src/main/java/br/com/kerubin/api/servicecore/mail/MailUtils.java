@@ -11,7 +11,7 @@ public class MailUtils {
 	public static final String EMAIL_KERUBIN_FINANCEIRO_PERSONAL = "Kerubin Financeiro";
 	public static final String EMAIL_KERUBIN_FINANCEIRO = "kerubin.financeiro@gmail.com";
 	
-	public static final String EMAIL_KERUBIN_SUPORTE = "kerubin.suporte@gmail.com";
+	public static final String EMAIL_KERUBIN_SUPORTE = "suporte@kerubin.com.br";
 	
 	public static final String EMAIL_KERUBIN_PLATFORM_PERSONAL = "Kerubin";
 	public static final String EMAIL_KERUBIN_PLATFORM = "kerubin.platform@gmail.com";
