@@ -40,7 +40,7 @@ public class MailUtils {
 	public static final String KERUBIN_LOGO = "<img alt=\"Kerubin\" src=\"https://i.ibb.co/DRRnWT1/logo.jpg\">";
 	
 	
-	public static String get_EMAIL_KERUBIN_FINANCEIRO_APP_PWD() {
+	public static String get_EMAIL_KERUBIN_FINANCEIRO_APP_PWD() { //
 		return getPropStrict("EMAIL_KERUBIN_FINANCEIRO_APP_PWD", null);
 	}
 	
