@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 import java.text.MessageFormat;
+import java.text.Normalizer;
 import java.text.NumberFormat;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -526,6 +527,12 @@ public class CoreUtils {
 	
 	public static long daysBetweenAbs(LocalDate date1, LocalDate date2) {
 		return Math.abs(daysBetween(date1, date2));
+	}
+	
+	public static String unaccent(String text) {
+		return Normalizer
+				.normalize(text, Normalizer.Form.NFD)
+				.replaceAll("[^\\p{ASCII}]", "");
 	}
 	
 	

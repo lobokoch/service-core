@@ -14,6 +14,18 @@ import java.util.List;
 
 public class CoreUtilsTests {
 	
+	private static final String accents 	= "È,É,Ê,Ë,Û,Ù,Ï,Î,À,Â,Ô,è,é,ê,ë,û,ù,ï,î,à,â,ô,Ç,ç,Ã,ã,Õ,õ";
+	private static final String expected	= "E,E,E,E,U,U,I,I,A,A,O,e,e,e,e,u,u,i,i,a,a,o,C,c,A,a,O,o";
+	
+	private static final String accents2	= "çÇáéíóúýÁÉÍÓÚÝàèìòùÀÈÌÒÙãõñäëïöüÿÄËÏÖÜÃÕÑâêîôûÂÊÎÔÛ";
+	private static final String expected2	= "cCaeiouyAEIOUYaeiouAEIOUaonaeiouyAEIOUAONaeiouAEIOU";
+	
+	private static final String accents3	= "Gisele Bündchen da Conceição e Silva foi batizada assim em homenagem à sua conterrânea de Horizontina, RS.";
+	private static final String expected3	= "Gisele Bundchen da Conceicao e Silva foi batizada assim em homenagem a sua conterranea de Horizontina, RS.";
+	
+	private static final String accents4	= "/Users/rponte/arquivos-portalfcm/Eletron/Atualização_Diária-1.23.40.exe";
+	private static final String expected4	= "/Users/rponte/arquivos-portalfcm/Eletron/Atualizacao_Diaria-1.23.40.exe";
+	
 	@Test
 	public void daysBetweenAbs() {
 		assertThat(CoreUtils.daysBetweenAbs(LocalDate.of(2020, 3, 7), LocalDate.of(2020, 3, 7))).isZero();
@@ -173,6 +185,14 @@ public class CoreUtilsTests {
 		List<String> actual = CoreUtils.getTokens(str);
 		
 		assertThat(actual).isEqualTo(expected);
+	}
+	
+	@Test
+	public void replacingAllAccents() {
+		assertThat(expected).isEqualTo(CoreUtils.unaccent(accents));
+		assertThat(expected2).isEqualTo(CoreUtils.unaccent(accents2));
+		assertThat(expected3).isEqualTo(CoreUtils.unaccent(accents3));
+		assertThat(expected4).isEqualTo(CoreUtils.unaccent(accents4));
 	}
 
 }
