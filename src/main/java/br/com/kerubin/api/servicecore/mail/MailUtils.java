@@ -8,6 +8,8 @@ public class MailUtils {
 	
 	public static final String EMAIL_LOBOKOCH = "lobokoch@gmail.com";
 	
+	public static final String EMAIL_KERUBIN_PJ = "kerubin.pj@gmail.com";
+	
 	public static final String EMAIL_KERUBIN_FINANCEIRO_PERSONAL = "Kerubin Financeiro";
 	public static final String EMAIL_KERUBIN_FINANCEIRO = "kerubin.financeiro@gmail.com";
 	
@@ -50,6 +52,10 @@ public class MailUtils {
 	
 	public static String get_EMAIL_KERUBIN_NOTIFICADOR_APP_PWD() {
 		return getPropStrict("EMAIL_KERUBIN_NOTIFICADOR_APP_PWD", null);
+	}
+	
+	public static String get_EMAIL_KERUBIN_PJ_PWD() {
+		return getPropStrict("EMAIL_KERUBIN_PJ_APP_PWD", null);
 	}
 	
 	public static String getUserNameForMail(String username) {

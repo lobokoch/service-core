@@ -42,6 +42,10 @@ public class CoreUtils {
 	
 	public static final Locale LOCALE_PT_BR = new Locale("pt","BR");
 	
+	public static String messageFormat(String pattern, Object ... arguments) {
+		return MessageFormat.format(pattern, arguments);
+	}
+	
 	public static String format(String pattern, Object ... arguments) {
 		return MessageFormat.format(pattern, arguments);
 	}
