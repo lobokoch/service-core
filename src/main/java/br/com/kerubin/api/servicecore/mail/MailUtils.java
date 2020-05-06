@@ -8,6 +8,9 @@ public class MailUtils {
 	
 	public static final String EMAIL_LOBOKOCH = "lobokoch@gmail.com";
 	
+	public static final String EMAIL_KERUBIN_ALERTA = "kerubin.alerta@mail.com";
+	public static final String EMAIL_KERUBIN_ALERTA2 = "kerubin.alerta2@gamil.com";
+	
 	public static final String EMAIL_KERUBIN_PJ = "kerubin.pj@gmail.com";
 	
 	public static final String EMAIL_KERUBIN_FINANCEIRO_PERSONAL = "Kerubin Financeiro";
@@ -41,6 +44,14 @@ public class MailUtils {
 	public static final String KERUBIN_LINK = "<span style=\"color: #1e94d2; font-weight: bold;\"><a href=\"" + KERUBIN_URL + "\">Kerubin</a></span>";
 	public static final String KERUBIN_LOGO = "<img alt=\"Kerubin\" src=\"https://i.ibb.co/DRRnWT1/logo.jpg\">";
 	
+	
+	public static String get_EMAIL_KERUBIN_ALERTA_APP_PWD() { //
+		return getPropStrict("EMAIL_KERUBIN_ALERTA_APP_PWD", null);
+	}
+	
+	public static String get_EMAIL_KERUBIN_ALERTA2_APP_PWD() { //
+		return getPropStrict("EMAIL_KERUBIN_ALERTA2_APP_PWD", null);
+	}
 	
 	public static String get_EMAIL_KERUBIN_FINANCEIRO_APP_PWD() { //
 		return getPropStrict("EMAIL_KERUBIN_FINANCEIRO_APP_PWD", null);
