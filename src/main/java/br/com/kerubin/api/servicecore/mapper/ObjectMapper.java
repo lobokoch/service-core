@@ -18,9 +18,11 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -91,7 +93,7 @@ public class ObjectMapper {
 		}
 		
 	    public static boolean isList(Object obj) {
-	    	return obj != null && obj instanceof List;
+	    	return obj != null && (obj instanceof Collection);
 	    }
 		
 	    @SuppressWarnings("unchecked")
@@ -103,9 +105,9 @@ public class ObjectMapper {
 	        visited.put(source, target);
 	        
 	        if (isList(source)) {
-	        	List<Object> sourceList = (List<Object>) source;
-	        	List<Object> targetList = (List<Object>) target;
-	        	Class<?> targetListItemClass = targetList.get(0).getClass();
+	        	Collection<Object> sourceList = (Collection<Object>) source;
+	        	Collection<Object> targetList = (Collection<Object>) target;
+	        	Class<?> targetListItemClass = targetList.iterator().next().getClass();
 	        	targetList.clear();
 	        	if (isEmpty(sourceList)) {
 	        		return;
@@ -162,13 +164,16 @@ public class ObjectMapper {
 						            targetFieldValue = visited.get(sourceFieldValue);
 						        }
 						        else {
-						        	if (targetFieldType.equals(List.class)) {
-										targetFieldValue = BeanUtils.instantiateClass(ArrayList.class);
-						        		
+						        	if (targetFieldType.equals(List.class) || targetFieldType.equals(Set.class)) {
+						        		if (targetFieldType.equals(List.class)) {
+						        			targetFieldValue = BeanUtils.instantiateClass(ArrayList.class);						        			
+						        		} else {
+						        			targetFieldValue = BeanUtils.instantiateClass(HashSet.class);	        			
+						        		}
 						        		ParameterizedType listType = (ParameterizedType) targetField.getGenericType();
 						        	    Class<?> listItemClass = (Class<?>) listType.getActualTypeArguments()[0];
 						        	    Object listItem = BeanUtils.instantiateClass(listItemClass);
-						        	    ((List<Object>)targetFieldValue).add(listItem);
+						        	    ((Collection<Object>)targetFieldValue).add(listItem);
 						        	}
 						        	else {
 						        		targetFieldValue = BeanUtils.instantiateClass(targetFieldType);
