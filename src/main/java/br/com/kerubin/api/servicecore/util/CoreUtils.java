@@ -11,6 +11,7 @@ import java.text.NumberFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -164,6 +165,11 @@ public class CoreUtils {
 	public static String formatDateAndTime(LocalDateTime dateAnTime) {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 		return formatter.format(dateAnTime);
+	}
+	
+	public static String formatTime(LocalTime time) {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+		return formatter.format(time);
 	}
 	
 	public static String formatMoney(DecimalFormat df, BigDecimal value) {
