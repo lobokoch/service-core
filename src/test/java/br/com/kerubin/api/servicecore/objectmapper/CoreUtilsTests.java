@@ -1,16 +1,19 @@
 package br.com.kerubin.api.servicecore.objectmapper;
 
-import org.junit.Test;
-
-import br.com.kerubin.api.servicecore.util.CoreUtils;
-
-import static org.assertj.core.api.Assertions.*;
+import static br.com.kerubin.api.servicecore.util.CoreUtils.head;
+import static br.com.kerubin.api.servicecore.util.CoreUtils.headOrElse;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import org.junit.Test;
+
+import br.com.kerubin.api.servicecore.util.CoreUtils;
 
 public class CoreUtilsTests {
 	
@@ -194,5 +197,48 @@ public class CoreUtilsTests {
 		assertThat(expected3).isEqualTo(CoreUtils.unaccent(accents3));
 		assertThat(expected4).isEqualTo(CoreUtils.unaccent(accents4));
 	}
+	
+	@Test
+	public void testHead1() {
+		List<String> list = Arrays.asList("One", "Two", "Three");
+		assertThat(head(list)).isEqualTo("One");		
+	}
+	
+	@Test
+	public void testHead2() {
+		List<String> list = new ArrayList<>();
+		assertThat(head(list)).isNull();		
+	}
+	
+	@Test
+	public void testHead3() {
+		List<String> list = Collections.emptyList();
+		assertThat(head(list)).isNull();		
+	}
+	
+	@Test
+	public void testHeadOrElse1() {
+		List<String> list = Arrays.asList("One", "Two", "Three");
+		assertThat(headOrElse(list, null)).isEqualTo("One");		
+	}
+	
+	@Test
+	public void testHeadOrElse2() {
+		List<String> list = new ArrayList<>();
+		assertThat(headOrElse(list, null)).isNull();		
+	}
+	
+	@Test
+	public void testHeadOrElse3() {
+		List<String> list = Collections.emptyList();
+		assertThat(headOrElse(list, null)).isNull();		
+	}
+	
+	@Test
+	public void testHeadOrElse4() {
+		List<String> list = Collections.emptyList();
+		assertThat(headOrElse(list, "One")).isEqualTo("One");		
+	}
+	
 
 }

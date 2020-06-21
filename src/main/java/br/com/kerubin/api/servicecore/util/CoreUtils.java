@@ -23,13 +23,16 @@ import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.helpers.MessageFormatter;
 
 public class CoreUtils {
 	
@@ -42,6 +45,10 @@ public class CoreUtils {
 	public static final String AUTO_COMPLETE = "autocomplete";
 	
 	public static final Locale LOCALE_PT_BR = new Locale("pt","BR");
+	
+	public static final String textFormat(String pattern, Object ... arguments) {
+        return MessageFormatter.arrayFormat(pattern, arguments).getMessage();
+    }
 	
 	public static String messageFormat(String pattern, Object ... arguments) {
 		return MessageFormat.format(pattern, arguments);
@@ -67,29 +74,41 @@ public class CoreUtils {
 		return index == value.length();
 	}
 	
-	public static boolean isNotEmpty(Object value) {
-		return !isEmpty(value);
-	}
-	
-	public static boolean isEmpty(Object value) {
-		if (value == null) {
-			return true;
-		}
-		
-		if (value instanceof String) {
-			return ((String) value).trim().isEmpty();
-		}
-		
-		if (value instanceof Collection) {
-			return ((Collection<?>) value).isEmpty();
-		}
-		
-		if (value.getClass().isArray()) {
-			return Arrays.asList(value).isEmpty();
-		}
-		
-		return false;
-	}
+	public static boolean isNull(Object obj) {
+        return obj == null;
+    }
+    
+    public static boolean isNotNull(Object obj) {
+        return obj != null;
+    }
+    
+    public static boolean isNotEmpty(Object value) {
+        return !isEmpty(value);
+    }
+    
+    public static boolean isEmpty(Object value) {
+        if (value == null) {
+            return true;
+        }
+        
+        if (value instanceof String) {
+            return ((String) value).trim().isEmpty();
+        }
+        
+        if (value instanceof Collection) {
+            return ((Collection<?>) value).isEmpty();
+        }
+        
+        if (value instanceof Map) {
+            return ((Map<?, ?>) value).isEmpty();
+        }
+        
+        if (value.getClass().isArray()) {
+            return Arrays.asList(value).isEmpty();
+        }
+        
+        return false;
+    }
 	
 	public static String getFirstName(String fullName) {
 		String firstName = fullName.substring(0, fullName.indexOf(' ')).trim();
@@ -527,6 +546,10 @@ public class CoreUtils {
 		return tokens.stream().collect(Collectors.toList());
 	}
 	
+	public static <T> Set<T> toSafeSet(Set<T> aSet) {
+		return isNotEmpty(aSet) ? aSet : Collections.emptySet();
+	}
+	
 	public static <T> List<T> toSafeList(List<T> aList) {
 		return isNotEmpty(aList) ? aList : Collections.emptyList();
 	}
@@ -545,5 +568,54 @@ public class CoreUtils {
 				.replaceAll("[^\\p{ASCII}]", "");
 	}
 	
+	public static final void checkNotNull(Object object, String message) {
+        if (object == null) {
+            throw new IllegalStateException(message);
+        }
+    }
+    
+    public static final void checkNotEmpty(Object object, String message) {
+        if (isEmpty(object)) {
+            throw new IllegalStateException(message);
+        }
+    }
+    
+    public static final void checkIsFalse(boolean value, String message) {
+        if (value) {
+            throw new IllegalStateException(message);
+        }
+    }
+    
+    public static final void checkIsTrue(boolean value, String message) {
+        if (!value) {
+            throw new IllegalStateException(message);
+        }
+    }
+	
+    public static boolean inheritsFrom(Object obj, Class<?> clazz) {
+        if(obj == null) {
+            return false;
+        }
+        return inheritsFrom(obj.getClass(), clazz);
+    }
+    
+    public static boolean inheritsFrom(Class<?> objClass, Class<?> clazz) {
+        if (objClass == null || clazz == null) {
+            return false;
+        }
+        return clazz.isAssignableFrom(objClass);
+    }
+    
+    public static UUID uuid(String str) {
+        return UUID.fromString(str);
+    }
+    
+    public static <T> T head(Collection<T> list) {
+    	return isNotEmpty(list) ? list.iterator().next() : null;
+    }
+    
+    public static <T> T headOrElse(List<T> list, T v) {
+    	return isNotEmpty(list) ? list.get(0) : v;
+    }
 	
 }
