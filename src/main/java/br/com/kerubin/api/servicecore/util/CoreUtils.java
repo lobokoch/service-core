@@ -610,6 +610,14 @@ public class CoreUtils {
         return UUID.fromString(str);
     }
     
+    public static List<UUID> uuids(String... strIds) {
+    	if (isEmpty(strIds)) {
+    		return Collections.emptyList();
+    	}
+    	
+    	return Arrays.asList(strIds).stream().map(UUID::fromString).collect(Collectors.toList());
+    }
+    
     public static <T> T head(Collection<T> list) {
     	return isNotEmpty(list) ? list.iterator().next() : null;
     }
