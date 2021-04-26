@@ -21,7 +21,7 @@
 		<hibernate.core.version>5.2.16.Final</hibernate.core.version>
 		<projectlombok.version>1.18.8</projectlombok.version>
 		<commonslang3.version>3.9</commonslang3.version>
-		<commons-io.version>2.6</commons-io.version>
+		<commons-io.version>2.7</commons-io.version>
 		<hibernate-validator.version>6.0.17.Final</hibernate-validator.version>
 	</properties>
 
